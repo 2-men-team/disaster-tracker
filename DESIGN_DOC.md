@@ -58,13 +58,14 @@ The simplest approach would be to use the following system:
 ![simple design](simple-disaster-tracker.png)
 
 There are a few problems/possibilities for improvement with this approach:
-- The amount of time it takes to produce a warning for a newly created calendar event depends on the scheduling settings of the `Warning producer` cron job and the `DIsaster fetcher` cron job.
+- The amount of time it takes to produce a warning for a newly created calendar event depends on the scheduling settings of the `Warning producer` cron job and the `Disaster fetcher` cron job.
 - `Warning producer` can be quite inefficient since it will have to:
   - fetch all the disasters and all the calendar events
   - cross check them with each other and produce warnings
   - take into account that different users have different calendar time-frames.
+It's probably possible, though, to fetch all monitored calendar events using a single SQL query with joins, so this shouldn't be a problem.
 
-Thus, the proposed system is the following:
+An alternative approach:
 ![final system](final-disaster-tracker.png)
 
 Here, the functionality of the `Warning producer` was decoupled into two entities: `Check new calendar events` and `Check new disaster events`. They work as follows:
@@ -79,11 +80,14 @@ A similar procedure is used to handle new Disaster events:
 In both systems, `Warning manager` is responsible for the deduplication of produced warnings.
 
 Also things to consider:
-- Deduplication of disaster events.
+- Deduplication of disaster events. When we query the Disaster API, the returned disaster events might already be present in our Disaster DB. In this case, we ignore the duplicates. However, what happens if the query contains an updated event (e.i. it's present in our DB but is slightly different)? The solution would probably be to update the event and push it to the message queue to cross check it with the monitored calendar events. However, the produced warnings might be flagged as duplicates by the `Warning manager`.
 
 These diagrams don't include the API for changing user-specified configurations. The event flow for that API is as follows:
 - User changes `Calendar time-frame`.
 - Some of the events from the `Future calendar events` are moved into the `Monitored calendar events` and pushed to the message queue to the `Check new events`.
+
+**Conclusion**:
+Despite the fact that the second system is _probably_ more efficient than the first one, it still might be better to implement the first one for simplicity's sake.
 
 ## References
 1. https://developers.google.com/calendar/auth
