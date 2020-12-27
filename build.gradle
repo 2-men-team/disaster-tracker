@@ -24,6 +24,7 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-web'
 	implementation 'org.springframework.boot:spring-boot-starter-webflux'
 	implementation 'org.apache.kafka:kafka-streams'
+	compile 'io.projectreactor.kafka:reactor-kafka:1.1.0.RELEASE'
 	implementation 'org.springframework.kafka:spring-kafka'
 	compileOnly 'org.projectlombok:lombok'
 	runtimeOnly 'dev.miku:r2dbc-mysql'
@@ -32,6 +33,11 @@ dependencies {
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testImplementation 'io.projectreactor:reactor-test'
 	testImplementation 'org.springframework.kafka:spring-kafka-test'
+	implementation 'com.google.api-client:google-api-client:1.23.0'
+	implementation 'com.google.oauth-client:google-oauth-client-jetty:1.23.0'
+	implementation 'com.google.apis:google-api-services-calendar:v3-rev305-1.23.0'
+	implementation 'com.google.maps:google-maps-services:0.15.0'
+	implementation 'org.slf4j:slf4j-simple:1.7.25'
 }
 
 test {
