@@ -8,20 +8,15 @@ import org.springframework.messaging.handler.annotation.Header;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import lombok.RequiredArgsConstructor;
 import reactor.core.publisher.Mono;
 
 @RestController("/event")
+@RequiredArgsConstructor
 public class CalendarEventController {
   private final CalendarEventService calendarEventService;
   private final AuthService authService;
   private final GoogleApiService googleApiService;
-
-  public CalendarEventController(CalendarEventService calendarEventService, AuthService authService,
-                                 GoogleApiService googleApiService) {
-    this.calendarEventService = calendarEventService;
-    this.authService = authService;
-    this.googleApiService = googleApiService;
-  }
 
   @PostMapping("/receive")
   public Mono<Void> receiveCalendarEvent(

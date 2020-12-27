@@ -14,22 +14,17 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.Collections;
 import java.util.List;
 
+import lombok.RequiredArgsConstructor;
 import reactor.core.publisher.Mono;
 
 @RestController("/auth")
+@RequiredArgsConstructor
 public class AuthController {
   private static final List<String> AUTH_SCOPES = Collections.singletonList(CalendarScopes.CALENDAR_READONLY);
 
   private final AuthService authService;
   private final GoogleApiService googleApiService;
   private final CalendarEventService calendarEventService;
-
-  public AuthController(AuthService authService, GoogleApiService googleApiService,
-                        CalendarEventService calendarEventService) {
-    this.authService = authService;
-    this.googleApiService = googleApiService;
-    this.calendarEventService = calendarEventService;
-  }
 
   @GetMapping("/register")
   public Mono<RegisterResponseBody> register(@RequestParam String webhook) {

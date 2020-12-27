@@ -14,11 +14,13 @@ import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.ArrayList;
 
+import lombok.RequiredArgsConstructor;
 import reactor.core.publisher.Flux;
 import reactor.util.function.Tuple2;
 import reactor.util.function.Tuples;
 
 @Component
+@RequiredArgsConstructor
 public class MatchDisasterEventJob {
   private static final int LOOKAHEAD_DAYS = 7;
   private static final int DISASTER_RADIUS = 20;
@@ -26,15 +28,6 @@ public class MatchDisasterEventJob {
   private final CalendarEventRepository calendarEventRepository;
   private final DisasterEventRepository disasterEventRepository;
   private final WarningsKafkaProducer warningsKafkaProducer;
-
-  @Autowired
-  public MatchDisasterEventJob(CalendarEventRepository calendarEventRepository,
-                               DisasterEventRepository disasterEventRepository,
-                               WarningsKafkaProducer warningsKafkaProducer) {
-    this.calendarEventRepository = calendarEventRepository;
-    this.disasterEventRepository = disasterEventRepository;
-    this.warningsKafkaProducer = warningsKafkaProducer;
-  }
 
   public boolean matchEvent(CalendarEvent calendarEvent, DisasterEvent disasterEvent) {
     double distance = distance(

@@ -12,20 +12,16 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.time.format.DateTimeFormatter;
 
+import lombok.RequiredArgsConstructor;
 import reactor.core.publisher.Flux;
 
 @RestController("/warning")
+@RequiredArgsConstructor
 public class WarningController {
   private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
   private final WarningService warningService;
   private final AuthService authService;
-
-  @Autowired
-  public WarningController(WarningService warningService, AuthService authService) {
-    this.warningService = warningService;
-    this.authService = authService;
-  }
 
   @GetMapping("/get")
   public Flux<Warning> getWarnings(@RequestParam String apiKey, @RequestParam String from, @RequestParam String to) {

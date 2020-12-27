@@ -11,16 +11,13 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 
+import lombok.RequiredArgsConstructor;
 import reactor.core.publisher.Flux;
 
 @Service
+@RequiredArgsConstructor
 public class WarningServiceImpl implements WarningService {
   private final WarningRepository warningRepository;
-
-  @Autowired
-  public WarningServiceImpl(WarningRepository warningRepository) {
-    this.warningRepository = warningRepository;
-  }
 
   @Override
   public Flux<Warning> retrieve(User user, LocalDateTime from, LocalDateTime to) {

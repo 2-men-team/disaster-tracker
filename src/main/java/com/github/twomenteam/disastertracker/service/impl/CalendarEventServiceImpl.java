@@ -6,19 +6,17 @@ import com.github.twomenteam.disastertracker.repository.WarningRepository;
 import com.github.twomenteam.disastertracker.service.CalendarEventService;
 
 import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
+import lombok.RequiredArgsConstructor;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-@Component
+@Service
+@RequiredArgsConstructor
 public class CalendarEventServiceImpl implements CalendarEventService {
   private final WarningRepository warningRepository;
   private final CalendarEventRepository calendarEventRepository;
-
-  public CalendarEventServiceImpl(WarningRepository warningRepository, CalendarEventRepository calendarEventRepository) {
-    this.warningRepository = warningRepository;
-    this.calendarEventRepository = calendarEventRepository;
-  }
 
   @Override
   public Mono<Void> upsertCalendarEvents(Flux<CalendarEvent> events) {

@@ -12,22 +12,16 @@ import org.springframework.stereotype.Component;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 
+import lombok.RequiredArgsConstructor;
+
 @Component
+@RequiredArgsConstructor
 public class WarningManagerJob {
   private static final String TOPIC = "new-warnings";
 
   private final WarningsKafkaConsumer warningsKafkaConsumer;
   private final WarningRepository warningRepository;
   private final CalendarEventRepository calendarEventRepository;
-
-  @Autowired
-  public WarningManagerJob(WarningsKafkaConsumer warningsKafkaConsumer,
-                           WarningRepository warningRepository,
-                           CalendarEventRepository calendarEventRepository) {
-    this.warningsKafkaConsumer = warningsKafkaConsumer;
-    this.warningRepository = warningRepository;
-    this.calendarEventRepository = calendarEventRepository;
-  }
 
   @Scheduled(initialDelay = 0, fixedDelay = Long.MAX_VALUE)
   public void listenToNewWarnings() {

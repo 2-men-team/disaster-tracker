@@ -9,19 +9,18 @@ import com.google.api.client.auth.oauth2.Credential;
 import com.google.api.services.calendar.CalendarScopes;
 
 import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
 import java.util.Objects;
 import java.util.UUID;
 
+import lombok.RequiredArgsConstructor;
 import reactor.core.publisher.Mono;
 
-@Component
+@Service
+@RequiredArgsConstructor
 public class AuthServiceImpl implements AuthService {
   private final UserRepository userRepository;
-
-  public AuthServiceImpl(UserRepository userRepository) {
-    this.userRepository = userRepository;
-  }
 
   @Override
   public Mono<User> findUserByApiKey(String apiKey) {

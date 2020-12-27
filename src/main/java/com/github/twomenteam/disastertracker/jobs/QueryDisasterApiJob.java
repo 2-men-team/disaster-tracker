@@ -13,16 +13,14 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import lombok.RequiredArgsConstructor;
+
 @Component
+@RequiredArgsConstructor
 public class QueryDisasterApiJob {
   private static final String EONET_REQUEST_URL = "https://eonet.sci.gsfc.nasa.gov/api/v3/events";
 
   private final DisasterEventRepository disasterEventRepository;
-  
-  @Autowired
-  public QueryDisasterApiJob(DisasterEventRepository disasterEventRepository) {
-    this.disasterEventRepository = disasterEventRepository;
-  }
 
   @Scheduled(fixedRate = 1000*60*60*12)
   public void queryDisasterApi() {

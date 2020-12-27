@@ -21,6 +21,7 @@ import com.google.maps.GeoApiContext;
 import com.google.maps.GeocodingApi;
 
 import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -38,7 +39,7 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
 
-@Component
+@Service
 public class GoogleApiServiceImpl implements GoogleApiService {
   private static final String CLIENT_SECRETS_FILE = "/credentials.json";
   private static final JsonFactory JSON_FACTORY = JacksonFactory.getDefaultInstance();
