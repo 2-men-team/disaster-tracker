@@ -43,14 +43,14 @@ import reactor.core.scheduler.Schedulers;
 public class GoogleApiServiceImpl implements GoogleApiService {
   private static final String CLIENT_SECRETS_FILE = "/credentials.json";
   private static final JsonFactory JSON_FACTORY = JacksonFactory.getDefaultInstance();
-  private static final String THIS_SERVER_PROTOCOL_AND_DOMAIN = "https://techsheet.dev/";
+  private static final String THIS_SERVER_PROTOCOL_AND_DOMAIN = "https://techsheet.dev:8080";
   private static final NetHttpTransport NET_HTTP_TRANSPORT;
   private static final String APPLICATION_NAME = "Disaster tracker";
   private static final GoogleClientSecrets CLIENT_SECRETS;
   private static final String CALENDAR_ID = "primary";
   private static final String DEFAULT_TIME_ZONE = "UTC";
   private static final GeoApiContext GEO_API_CONTEXT = new GeoApiContext.Builder()
-      .apiKey("AIzaSyAadA1Fz2sGLzxfKCYY_3tPP7B0fVQA6EI")
+      .apiKey("AIzaSyC4sC4XLIV2HDAh24yIvd9nwmYeLbjeVNc")
       .build();
 
   static {

@@ -8,7 +8,7 @@ create table user (
     access_token varchar(150),
     refresh_token varchar(150),
     expiration_time_in_millis long,
-    notification_webhook_url varchar(150) not null,
+    notification_webhook_url varchar(150),
     next_sync_token varchar(50)
 );
 
