@@ -228,6 +228,7 @@ public class GoogleApiServiceImpl implements GoogleApiService {
 
   private Credential newCredential(GoogleAuthorizationCodeFlow flow) {
     return new Credential.Builder(flow.getMethod())
+        .setTransport(flow.getTransport())
         .setClock(flow.getClock())
         .setJsonFactory(flow.getJsonFactory())
         .setClientAuthentication(flow.getClientAuthentication())
