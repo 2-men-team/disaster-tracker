@@ -121,8 +121,8 @@ public class AuthControllerTest {
         .build();
     var user = User.builder()
         .id(45)
-        .authToken(authToken)
-        .build();
+        .build()
+        .withAuthToken(authToken);
     var calendarEvents = CalendarEvents.builder()
         .nextSyncToken("some next sync token")
         .events(Flux.empty())

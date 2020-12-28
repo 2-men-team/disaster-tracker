@@ -1,6 +1,7 @@
 package com.github.twomenteam.disastertracker.model.db;
 
 import lombok.Builder;
+import lombok.NonNull;
 import lombok.Value;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.relational.core.mapping.Embedded;
@@ -20,6 +21,20 @@ public class CalendarEvent {
   LocalDateTime start;
   LocalDateTime end;
   String location;
-  @Embedded.Nullable
-  Coordinates coordinates;
+  double latitude;
+  double longitude;
+
+  public Coordinates getCoordinates() {
+    return Coordinates.builder()
+        .latitude(latitude)
+        .longitude(longitude)
+        .build();
+  }
+
+  public CalendarEvent withCoordinates(@NonNull Coordinates coordinates) {
+    return toBuilder()
+        .latitude(coordinates.getLatitude())
+        .longitude(coordinates.getLongitude())
+        .build();
+  }
 }

@@ -100,8 +100,8 @@ public class GoogleApiServiceImpl implements GoogleApiService {
                     .start(eventDateTimeToLocalDateTime(event.getStart()))
                     .end(eventDateTimeToLocalDateTime(event.getEnd()))
                     .location(event.getLocation())
-                    .coordinates(coordinates)
-                    .build()));
+                    .build()
+                    .withCoordinates(coordinates)));
 
     return result.events(calendarEvents).build();
   }

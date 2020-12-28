@@ -43,10 +43,7 @@ public class AuthServiceImpl implements AuthService {
   @Override
   public Mono<User> saveAuthToken(String apiKey, AuthToken authToken) {
     return findUserByApiKey(apiKey)
-        .flatMap(user -> userRepository.save(
-            user.toBuilder()
-                .authToken(authToken)
-                .build()));
+        .flatMap(user -> userRepository.save(user.withAuthToken(authToken)));
   }
 
   @Override

@@ -76,8 +76,8 @@ public class CalendarEventControllerTest {
         .apiKey("some api key")
         .id(34)
         .nextSyncToken("first sync token")
-        .authToken(AuthToken.builder().build())
-        .build();
+        .build()
+        .withAuthToken(AuthToken.builder().build());
 
     when(authService.findUserByApiKey(user.getApiKey()))
         .thenReturn(Mono.just(user));
@@ -162,15 +162,13 @@ public class CalendarEventControllerTest {
         .apiKey("some api key")
         .id(34)
         .nextSyncToken("first sync token")
-        .authToken(AuthToken.builder().build())
-        .build();
+        .build()
+        .withAuthToken(AuthToken.builder().build());
     var newAuthToken = AuthToken.builder()
         .refreshToken("some new refresh token")
         .accessToken("some new access token")
         .build();
-    var newUser = user.toBuilder()
-        .authToken(newAuthToken)
-        .build();
+    var newUser = user.withAuthToken(newAuthToken);
 
     when(authService.findUserByApiKey(user.getApiKey()))
         .thenReturn(Mono.just(user));
