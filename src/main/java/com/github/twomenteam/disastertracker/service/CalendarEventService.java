@@ -7,4 +7,5 @@ import reactor.core.publisher.Mono;
 
 public interface CalendarEventService {
   Mono<Void> upsertCalendarEvents(Flux<CalendarEvent> events);
+  Mono<Void> removeCalendarEvents(Flux<CalendarEvent> events);
 }

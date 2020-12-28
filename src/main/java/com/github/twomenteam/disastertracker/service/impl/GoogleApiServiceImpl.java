@@ -50,7 +50,7 @@ public class GoogleApiServiceImpl implements GoogleApiService {
   private static final String CALENDAR_ID = "primary";
   private static final String DEFAULT_TIME_ZONE = "UTC";
   private static final GeoApiContext GEO_API_CONTEXT = new GeoApiContext.Builder()
-      .apiKey(getMapsApiKey())
+      .apiKey("AIzaSyAadA1Fz2sGLzxfKCYY_3tPP7B0fVQA6EI")
       .build();
 
   static {
@@ -229,10 +229,6 @@ public class GoogleApiServiceImpl implements GoogleApiService {
         .setRequestInitializer(flow.getRequestInitializer())
         .setTokenServerEncodedUrl(flow.getTokenServerEncodedUrl())
         .build();
-  }
-
-  private static String getMapsApiKey() {
-    throw new UnsupportedOperationException();
   }
 
   private GoogleAuthorizationCodeFlow getAuthFlow(List<String> scopes) {

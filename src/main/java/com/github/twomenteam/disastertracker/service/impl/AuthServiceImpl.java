@@ -1,5 +1,6 @@
 package com.github.twomenteam.disastertracker.service.impl;
 
+import com.github.twomenteam.disastertracker.Utils;
 import com.github.twomenteam.disastertracker.model.db.AuthToken;
 import com.github.twomenteam.disastertracker.model.db.User;
 import com.github.twomenteam.disastertracker.repository.UserRepository;
@@ -11,6 +12,7 @@ import com.google.api.services.calendar.CalendarScopes;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
+import java.time.Duration;
 import java.util.Objects;
 import java.util.UUID;
 
@@ -24,7 +26,9 @@ public class AuthServiceImpl implements AuthService {
 
   @Override
   public Mono<User> findUserByApiKey(String apiKey) {
-    return userRepository.findUserByApiKey(apiKey);
+    return userRepository
+        .findUserByApiKey(apiKey)
+        .timeout(Utils.TIMEOUT_DURATION);
   }
 
   @Override

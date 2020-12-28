@@ -37,4 +37,10 @@ public class CalendarEventServiceImpl implements CalendarEventService {
             .flatMap(calendarEventRepository::save))
         .then();
   }
+
+  @Override
+  public Mono<Void> removeCalendarEvents(Flux<CalendarEvent> events) {
+    return calendarEventRepository
+        .deleteAllByGoogleId(events.map(CalendarEvent::getGoogleId));
+  }
 }

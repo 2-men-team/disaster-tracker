@@ -8,6 +8,7 @@ import com.google.api.services.calendar.CalendarScopes;
 
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -17,7 +18,8 @@ import java.util.List;
 import lombok.RequiredArgsConstructor;
 import reactor.core.publisher.Mono;
 
-@RestController("/auth")
+@RestController
+@RequestMapping("/auth")
 @RequiredArgsConstructor
 public class AuthController {
   private static final List<String> AUTH_SCOPES = Collections.singletonList(CalendarScopes.CALENDAR_READONLY);
@@ -27,7 +29,7 @@ public class AuthController {
   private final CalendarEventService calendarEventService;
 
   @GetMapping("/register")
-  public Mono<RegisterResponseBody> register(@RequestParam String webhook) {
+  public Mono<RegisterResponseBody> register(@RequestParam(required = false) String webhook) {
     return authService
         .createNewUser(webhook)
         .map(user -> RegisterResponseBody.builder()

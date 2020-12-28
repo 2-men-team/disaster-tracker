@@ -5,20 +5,24 @@ import com.github.twomenteam.disastertracker.model.db.Warning;
 import com.github.twomenteam.disastertracker.service.AuthService;
 import com.github.twomenteam.disastertracker.service.WarningService;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 
 import lombok.RequiredArgsConstructor;
 import reactor.core.publisher.Flux;
 
-@RestController("/warning")
+@RestController
+@RequestMapping("/warning")
 @RequiredArgsConstructor
 public class WarningController {
-  private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+  public static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
   private final WarningService warningService;
   private final AuthService authService;
@@ -35,10 +39,13 @@ public class WarningController {
               var toDateTime = tuple.getT2();
 
               if (fromDateTime.isAfter(toDateTime)) {
-                return Flux.error(new IllegalArgumentException("'from' must be before 'to'"));
+                return Flux.error(new ResponseStatusException(HttpStatus.BAD_REQUEST, "'from' must be before 'to'"));
               }
 
               return warningService.retrieve(user, fromDateTime, toDateTime);
-            }));
+            })
+            .onErrorMap(DateTimeParseException.class,
+                e -> new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST, "Date parameters have invalid format")));
   }
 }
