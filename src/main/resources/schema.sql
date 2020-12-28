@@ -4,12 +4,12 @@ use disaster_tracker;
 
 create table user (
     id int primary key auto_increment,
-    api_key varchar(50) not null ,
-    access_token varchar(150),
-    refresh_token varchar(150),
+    api_key text not null ,
+    access_token text,
+    refresh_token text,
     expiration_time_in_millis long,
     notification_webhook_url varchar(150),
-    next_sync_token varchar(50)
+    next_sync_token text
 );
 
 create table calendar_event (

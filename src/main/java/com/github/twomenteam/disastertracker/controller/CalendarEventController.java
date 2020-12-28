@@ -35,6 +35,7 @@ public class CalendarEventController {
   @PostMapping("/receive")
   public Mono<Void> receiveCalendarEvent(@RequestHeader(TOKEN_HEADER_NAME) String apiKey,
                                          @RequestHeader(STATE_HEADER_NAME) String state) {
+    System.out.println("Received new state: " + state);
     if (SYNC_STATE.equals(state)) {
       return Mono.empty();
     }
@@ -49,6 +50,7 @@ public class CalendarEventController {
 
     return authService
         .findUserByApiKey(apiKey)
+        .doOnNext(user -> System.out.println("Got user " + user))
         .flatMap(user -> googleApiService
             .refreshToken(user.getAuthToken(), GoogleApiService.DEFAULT_SCOPES)
             .flatMap(newToken -> authService.saveAuthToken(apiKey, newToken))
@@ -56,6 +58,7 @@ public class CalendarEventController {
         .flatMap(user -> googleApiService
             .fetchLatestEvents(user.getAuthToken(), user.getNextSyncToken(),
                 GoogleApiService.DEFAULT_SCOPES, user.getId())
+            .doOnNext(events -> System.out.println("Fetched events " + events))
             .flatMap(calendarEvents -> authService
                 .saveNextSyncToken(user, calendarEvents.getNextSyncToken())
                 .and(handleNewEvents.apply(calendarEvents.getEvents()))));
