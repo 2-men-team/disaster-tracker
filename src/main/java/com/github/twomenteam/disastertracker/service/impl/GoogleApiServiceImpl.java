@@ -44,6 +44,8 @@ public class GoogleApiServiceImpl implements GoogleApiService {
   private static final String CLIENT_SECRETS_FILE = "/credentials.json";
   private static final JsonFactory JSON_FACTORY = JacksonFactory.getDefaultInstance();
   private static final String THIS_SERVER_PROTOCOL_AND_DOMAIN = "https://techsheet.dev:8080";
+  private static final String REDIRECT_URI = THIS_SERVER_PROTOCOL_AND_DOMAIN + "/auth/code/";
+  private static final String WEB_HOOK_URI = THIS_SERVER_PROTOCOL_AND_DOMAIN + "/event/receive";
   private static final NetHttpTransport NET_HTTP_TRANSPORT;
   private static final String APPLICATION_NAME = "Disaster tracker";
   private static final GoogleClientSecrets CLIENT_SECRETS;
@@ -140,7 +142,7 @@ public class GoogleApiServiceImpl implements GoogleApiService {
         getCalendarApi(credentialFromToken(token, scopes))
             .events()
             .watch(CALENDAR_ID, new Channel()
-                .setAddress(THIS_SERVER_PROTOCOL_AND_DOMAIN + "/event/receive")
+                .setAddress(WEB_HOOK_URI)
                 .setId(UUID.randomUUID().toString())
                 .setType("web_hook")
                 .setToken(apiKey)
@@ -164,14 +166,17 @@ public class GoogleApiServiceImpl implements GoogleApiService {
 
   @Override
   public String getAuthUrl(String apiKey, List<String> scopes) {
-    var redirectUri = THIS_SERVER_PROTOCOL_AND_DOMAIN + "/auth/code/";
-    return getAuthFlow(scopes).newAuthorizationUrl().setState(apiKey).setRedirectUri(redirectUri).build();
+    return getAuthFlow(scopes)
+        .newAuthorizationUrl()
+        .setState(apiKey)
+        .setRedirectUri(REDIRECT_URI)
+        .build();
   }
 
   @Override
   public Mono<AuthToken> getTokenFromCode(String authCode, List<String> scopes) {
     var flow = getAuthFlow(scopes);
-    return Mono.fromCallable(() -> flow.newTokenRequest(authCode).execute())
+    return Mono.fromCallable(() -> flow.newTokenRequest(authCode).setRedirectUri(REDIRECT_URI).execute())
         .subscribeOn(Schedulers.boundedElastic())
         .map(googleTokenResponse -> newCredential(flow)
             .setFromTokenResponse(googleTokenResponse))
