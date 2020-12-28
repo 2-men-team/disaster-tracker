@@ -17,7 +17,7 @@ import reactor.util.function.Tuple2;
 
 @Component
 public class WarningsKafkaProducer {
-  public static final String BOOTSTRAP_SERVERS = "";
+  public static final String BOOTSTRAP_SERVERS = "localhost:9092";
   public static final String TOPIC = "new-warnings";
 
   private final KafkaSender<Integer, Integer> sender;

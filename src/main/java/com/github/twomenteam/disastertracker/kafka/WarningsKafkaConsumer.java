@@ -16,7 +16,7 @@ import reactor.kafka.receiver.ReceiverRecord;
 
 @Component
 public class WarningsKafkaConsumer {
-  private static final String BOOTSTRAP_SERVERS = "";
+  private static final String BOOTSTRAP_SERVERS = "localhost:9092";
   private static final String TOPIC = "new-warnings";
 
   private final ReceiverOptions<Integer, Integer> receiverOptions;

@@ -43,7 +43,7 @@ import reactor.core.scheduler.Schedulers;
 public class GoogleApiServiceImpl implements GoogleApiService {
   private static final String CLIENT_SECRETS_FILE = "/credentials.json";
   private static final JsonFactory JSON_FACTORY = JacksonFactory.getDefaultInstance();
-  private static final String THIS_SERVER_PROTOCOL_AND_DOMAIN = "TODO"; // TODO
+  private static final String THIS_SERVER_PROTOCOL_AND_DOMAIN = "https://techsheet.dev/";
   private static final NetHttpTransport NET_HTTP_TRANSPORT;
   private static final String APPLICATION_NAME = "Disaster tracker";
   private static final GoogleClientSecrets CLIENT_SECRETS;
@@ -140,7 +140,7 @@ public class GoogleApiServiceImpl implements GoogleApiService {
         getCalendarApi(credentialFromToken(token, scopes))
             .events()
             .watch(CALENDAR_ID, new Channel()
-                .setAddress(THIS_SERVER_PROTOCOL_AND_DOMAIN + "/receive")
+                .setAddress(THIS_SERVER_PROTOCOL_AND_DOMAIN + "/event/receive")
                 .setId(UUID.randomUUID().toString())
                 .setType("web_hook")
                 .setToken(apiKey)
@@ -164,7 +164,7 @@ public class GoogleApiServiceImpl implements GoogleApiService {
 
   @Override
   public String getAuthUrl(String apiKey, List<String> scopes) {
-    var redirectUri = THIS_SERVER_PROTOCOL_AND_DOMAIN + "/code/" + apiKey;
+    var redirectUri = THIS_SERVER_PROTOCOL_AND_DOMAIN + "/auth/code/" + apiKey;
     return getAuthFlow(scopes).newAuthorizationUrl().setRedirectUri(redirectUri).build();
   }
 
