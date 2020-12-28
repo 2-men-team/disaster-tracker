@@ -1,3 +1,7 @@
+create database if not exists disaster_tracker;
+
+use disaster_tracker;
+
 create table user (
     id int primary key auto_increment,
     api_key varchar(50) not null ,
