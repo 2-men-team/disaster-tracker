@@ -38,8 +38,8 @@ public class AuthController {
             .build());
   }
 
-  @GetMapping("/code/{apiKey}")
-  public Mono<Void> receiveAuthCode(@PathVariable String apiKey,
+  @GetMapping("/code")
+  public Mono<Void> receiveAuthCode(@RequestParam("state") String apiKey,
                                     @RequestParam String code, @RequestParam String scope) {
     var scopes = Collections.singletonList(scope);
 

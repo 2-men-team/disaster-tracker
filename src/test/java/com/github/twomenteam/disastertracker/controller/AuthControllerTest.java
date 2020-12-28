@@ -148,10 +148,11 @@ public class AuthControllerTest {
 
     webTestClient.get()
         .uri(uriBuilder -> uriBuilder
-            .path("/auth/code/{apiKey}")
+            .path("/auth/code")
             .queryParam("code", code)
             .queryParam("scope", scope)
-            .build(apiKey))
+            .queryParam("state", apiKey)
+            .build())
         .exchange()
         .expectStatus().isOk()
         .expectBody().isEmpty();

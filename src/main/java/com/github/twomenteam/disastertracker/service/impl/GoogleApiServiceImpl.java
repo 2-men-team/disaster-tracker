@@ -164,8 +164,8 @@ public class GoogleApiServiceImpl implements GoogleApiService {
 
   @Override
   public String getAuthUrl(String apiKey, List<String> scopes) {
-    var redirectUri = THIS_SERVER_PROTOCOL_AND_DOMAIN + "/auth/code/" + apiKey;
-    return getAuthFlow(scopes).newAuthorizationUrl().setRedirectUri(redirectUri).build();
+    var redirectUri = THIS_SERVER_PROTOCOL_AND_DOMAIN + "/auth/code/";
+    return getAuthFlow(scopes).newAuthorizationUrl().setState(apiKey).setRedirectUri(redirectUri).build();
   }
 
   @Override
