@@ -11,5 +11,4 @@ public interface AuthService {
   Mono<User> findUserByApiKey(String apiKey);
   Mono<User> createNewUser(String webhook);
   Mono<User> saveAuthToken(String apiKey, AuthToken authToken);
-  Mono<User> saveNextSyncToken(User user, String syncToken);
 }

@@ -3,7 +3,6 @@ package com.github.twomenteam.disastertracker.service.impl;
 import com.github.twomenteam.disastertracker.model.db.AuthToken;
 import com.github.twomenteam.disastertracker.model.db.CalendarEvent;
 import com.github.twomenteam.disastertracker.model.db.Coordinates;
-import com.github.twomenteam.disastertracker.model.dto.CalendarEvents;
 import com.github.twomenteam.disastertracker.service.GoogleApiService;
 import com.google.api.client.auth.oauth2.Credential;
 import com.google.api.client.googleapis.auth.oauth2.GoogleAuthorizationCodeFlow;
@@ -20,7 +19,6 @@ import com.google.api.services.calendar.model.Events;
 import com.google.maps.GeoApiContext;
 import com.google.maps.GeocodingApi;
 
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
@@ -30,7 +28,6 @@ import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZoneOffset;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
@@ -85,11 +82,8 @@ public class GoogleApiServiceImpl implements GoogleApiService {
     return Instant.ofEpochMilli(value).atZone(ZoneId.of(DEFAULT_TIME_ZONE)).toLocalDateTime();
   }
 
-  private CalendarEvents buildCalendarEvents(Events events, int userId) {
-    var result = CalendarEvents.builder()
-        .nextSyncToken(events.getNextSyncToken());
-
-    var calendarEvents = Flux.fromIterable(events.getItems())
+  private Flux<CalendarEvent> buildCalendarEvents(Events events, int userId) {
+    return Flux.fromIterable(events.getItems())
         .filter(event -> event.getLocation() != null)
         .flatMap(event ->
             getCoordinateFromAddress(event.getLocation())
@@ -102,12 +96,10 @@ public class GoogleApiServiceImpl implements GoogleApiService {
                     .location(event.getLocation())
                     .build()
                     .withCoordinates(coordinates)));
-
-    return result.events(calendarEvents).build();
   }
 
   @Override
-  public Mono<CalendarEvents> fetchAllEvents(AuthToken authToken, List<String> scopes, int userId) {
+  public Flux<CalendarEvent> fetchAllEvents(AuthToken authToken, List<String> scopes, int userId) {
     return Mono.fromCallable(() ->
         getCalendarApi(credentialFromToken(authToken, scopes))
             .events()
@@ -118,22 +110,22 @@ public class GoogleApiServiceImpl implements GoogleApiService {
             .execute())
         .subscribeOn(Schedulers.boundedElastic())
         .publishOn(Schedulers.parallel())
-        .map(events -> buildCalendarEvents(events, userId));
+        .flatMapMany(events -> buildCalendarEvents(events, userId));
   }
 
   @Override
-  public Mono<CalendarEvents> fetchLatestEvents(AuthToken token, String syncToken, List<String> scopes, int userId) {
+  public Flux<CalendarEvent> fetchLatestEvents(AuthToken token, Instant updateMin, List<String> scopes, int userId) {
     return Mono.fromCallable(() ->
         getCalendarApi(credentialFromToken(token, scopes))
             .events()
             .list(CALENDAR_ID)
-            .setSyncToken(syncToken)
+            .setUpdatedMin(new DateTime(updateMin.toEpochMilli()))
             .setTimeZone(DEFAULT_TIME_ZONE)
             .setSingleEvents(true)
             .execute())
         .subscribeOn(Schedulers.boundedElastic())
         .publishOn(Schedulers.parallel())
-        .map(events -> buildCalendarEvents(events, userId));
+        .flatMapMany(events -> buildCalendarEvents(events, userId));
   }
 
   @Override

@@ -8,8 +8,7 @@ create table user (
     access_token text,
     refresh_token text,
     expiration_time_in_millis long,
-    notification_webhook_url varchar(150),
-    next_sync_token text
+    notification_webhook_url varchar(150)
 );
 
 create table calendar_event (

@@ -1,8 +1,8 @@
 package com.github.twomenteam.disastertracker.controller;
 
 import com.github.twomenteam.disastertracker.model.db.AuthToken;
+import com.github.twomenteam.disastertracker.model.db.CalendarEvent;
 import com.github.twomenteam.disastertracker.model.db.User;
-import com.github.twomenteam.disastertracker.model.dto.CalendarEvents;
 import com.github.twomenteam.disastertracker.model.dto.RegisterResponseBody;
 import com.github.twomenteam.disastertracker.service.AuthService;
 import com.github.twomenteam.disastertracker.service.CalendarEventService;
@@ -23,8 +23,6 @@ import reactor.core.publisher.Mono;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.isNull;
-import static org.mockito.Mockito.only;
-import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
@@ -123,27 +121,19 @@ public class AuthControllerTest {
         .id(45)
         .build()
         .withAuthToken(authToken);
-    var calendarEvents = CalendarEvents.builder()
-        .nextSyncToken("some next sync token")
-        .events(Flux.empty())
-        .build();
-    var userWithSyncToken = user.toBuilder()
-        .nextSyncToken(calendarEvents.getNextSyncToken())
-        .build();
+    var calendarEvents = Flux.<CalendarEvent>empty();
 
     when(googleApiService.getTokenFromCode(code, scopes))
         .thenReturn(Mono.just(authToken));
     when(googleApiService.fetchAllEvents(authToken, scopes, user.getId()))
-        .thenReturn(Mono.just(calendarEvents));
+        .thenReturn(calendarEvents);
     when(googleApiService.watchCalendarEvents(authToken, apiKey, scopes))
         .thenReturn(Mono.empty());
 
     when(authService.saveAuthToken(apiKey, authToken))
         .thenReturn(Mono.just(user));
-    when(authService.saveNextSyncToken(user, calendarEvents.getNextSyncToken()))
-        .thenReturn(Mono.just(userWithSyncToken));
 
-    when(calendarEventService.upsertCalendarEvents(calendarEvents.getEvents()))
+    when(calendarEventService.upsertCalendarEvents(calendarEvents))
         .thenReturn(Mono.empty());
 
     webTestClient.get()
@@ -162,9 +152,8 @@ public class AuthControllerTest {
     verify(googleApiService).watchCalendarEvents(authToken, apiKey, scopes);
 
     verify(authService).saveAuthToken(apiKey, authToken);
-    verify(authService).saveNextSyncToken(user, calendarEvents.getNextSyncToken());
 
-    verify(calendarEventService).upsertCalendarEvents(calendarEvents.getEvents());
+    verify(calendarEventService).upsertCalendarEvents(calendarEvents);
 
     verifyNoMoreInteractions(authService, calendarEventService, googleApiService);
   }

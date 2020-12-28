@@ -45,11 +45,4 @@ public class AuthServiceImpl implements AuthService {
     return findUserByApiKey(apiKey)
         .flatMap(user -> userRepository.save(user.withAuthToken(authToken)));
   }
-
-  @Override
-  public Mono<User> saveNextSyncToken(User user, String syncToken) {
-    return userRepository.save(user.toBuilder()
-        .nextSyncToken(syncToken)
-        .build());
-  }
 }

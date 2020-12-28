@@ -19,7 +19,6 @@ public class User {
   String refreshToken;
   Long expirationTimeInMillis;
   String notificationWebhookUrl;
-  String nextSyncToken;
 
   public AuthToken getAuthToken() {
     return AuthToken.builder()
