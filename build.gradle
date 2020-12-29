@@ -2,6 +2,7 @@ plugins {
 	id 'org.springframework.boot' version '2.4.1'
 	id 'io.spring.dependency-management' version '1.0.10.RELEASE'
 	id 'java'
+	id 'net.bytebuddy.byte-buddy-gradle-plugin' version '1.10.9'
 }
 
 group = 'com.github.twomenteam'
@@ -9,12 +10,14 @@ version = '0.0.1-SNAPSHOT'
 sourceCompatibility = '11'
 
 configurations {
+	byteBuddyPlugin
 	compileOnly {
 		extendsFrom annotationProcessor
 	}
 }
 
 repositories {
+	maven { url 'https://repo.spring.io/milestone' }
 	mavenCentral()
 }
 
@@ -37,6 +40,21 @@ dependencies {
 	implementation 'com.google.oauth-client:google-oauth-client-jetty:1.23.0'
 	implementation 'com.google.apis:google-api-services-calendar:v3-rev305-1.23.0'
 	implementation 'com.google.maps:google-maps-services:0.15.0'
+	implementation 'io.projectreactor.tools:blockhound:1.0.4.RELEASE'
+	compile 'io.projectreactor:reactor-tools:3.4.0-RC2'
+	byteBuddyPlugin(
+			group: 'io.projectreactor',
+			name: 'reactor-tools',
+			version: '3.4.1',
+			classifier: 'original',
+	)
+}
+
+byteBuddy {
+	transformation {
+		plugin = "reactor.tools.agent.ReactorDebugByteBuddyPlugin"
+		classPath = configurations.byteBuddyPlugin
+	}
 }
 
 test {
