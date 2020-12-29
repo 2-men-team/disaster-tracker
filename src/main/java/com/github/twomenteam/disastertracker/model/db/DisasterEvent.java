@@ -15,7 +15,7 @@ public class DisasterEvent {
   int id;
   String externalId;
   String description;
-  boolean isActive;
+  boolean active;
   LocalDateTime start;
   LocalDateTime end;
   double latitude;

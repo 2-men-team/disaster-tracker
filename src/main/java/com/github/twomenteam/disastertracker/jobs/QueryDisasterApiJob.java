@@ -43,7 +43,7 @@ public class QueryDisasterApiJob {
           return DisasterEvent.builder()
               .description(event.getTitle())
               .externalId(event.getId())
-              .isActive(isActive)
+              .active(isActive)
               .start(Instant.parse(geometry.getDate()).atZone(ZoneOffset.UTC).toLocalDateTime())
               .end(isActive ? null : LocalDateTime.parse(event.getClosed()))
               .latitude(latitude)
