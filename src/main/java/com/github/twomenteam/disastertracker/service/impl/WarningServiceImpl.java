@@ -13,6 +13,7 @@ import java.time.LocalDateTime;
 
 import lombok.RequiredArgsConstructor;
 import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 @Service
 @RequiredArgsConstructor
@@ -22,5 +23,10 @@ public class WarningServiceImpl implements WarningService {
   @Override
   public Flux<Warning> retrieve(User user, LocalDateTime from, LocalDateTime to) {
     return warningRepository.findWarningsByUserIdAndCreatedAtBetween(user.getId(), from, to);
+  }
+
+  @Override
+  public Mono<Warning> getByUuid(String uuid) {
+    return warningRepository.findAllByUuid(uuid);
   }
 }

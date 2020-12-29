@@ -13,4 +13,5 @@ public interface WarningRepository extends ReactiveCrudRepository<Warning, Integ
   Flux<Warning> findWarningsByUserIdAndCreatedAtBetween(int userId, LocalDateTime from, LocalDateTime to);
   Mono<Warning> findWarningByCalendarEventIdAndDisasterEventId(int calendarEventId, int disasterEventId);
   Mono<Void> deleteAllByCalendarEventId(int calendarEventId);
+  Mono<Warning> findAllByUuid(String uuid);
 }

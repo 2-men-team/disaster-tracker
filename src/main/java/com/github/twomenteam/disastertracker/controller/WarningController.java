@@ -7,6 +7,7 @@ import com.github.twomenteam.disastertracker.service.WarningService;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -49,5 +50,10 @@ public class WarningController {
             .onErrorMap(DateTimeParseException.class,
                 e -> new ResponseStatusException(
                     HttpStatus.BAD_REQUEST, "Date parameters have invalid format")));
+  }
+
+  @GetMapping("/{uuid}")
+  public Mono<Warning> getByUuid(@PathVariable String uuid) {
+    return warningService.getByUuid(uuid);
   }
 }

@@ -36,6 +36,7 @@ create table disaster_event (
 
 create table warning (
     id int primary key auto_increment,
+    uuid varchar(128) not null unique ,
     user_id int not null ,
     calendar_event_id int not null ,
     disaster_event_id int not null ,

@@ -17,4 +17,5 @@ public class Warning {
   int calendarEventId;
   int disasterEventId;
   LocalDateTime createdAt;
+  String uuid;
 }
