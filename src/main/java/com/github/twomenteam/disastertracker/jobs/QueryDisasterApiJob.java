@@ -9,7 +9,9 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
+import java.time.Instant;
 import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -20,7 +22,6 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class QueryDisasterApiJob {
   private static final String EONET_REQUEST_URL = "https://eonet.sci.gsfc.nasa.gov/api/v3/events";
-  private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ISO_INSTANT;
 
   private final DisasterEventRepository disasterEventRepository;
 
@@ -40,7 +41,7 @@ public class QueryDisasterApiJob {
               .description(event.getTitle())
               .externalId(event.getId())
               .isActive(isActive)
-              .start(LocalDateTime.parse(geometry.getDate(), FORMATTER))
+              .start(Instant.parse(geometry.getDate()).atZone(ZoneOffset.UTC).toLocalDateTime())
               .end(isActive ? null : LocalDateTime.parse(event.getClosed()))
               .latitude((Double) geometry.getCoordinates().get(1))
               .longitude((Double) geometry.getCoordinates().get(0))
