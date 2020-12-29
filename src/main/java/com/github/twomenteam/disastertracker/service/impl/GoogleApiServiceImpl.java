@@ -125,7 +125,6 @@ public class GoogleApiServiceImpl implements GoogleApiService {
             .setSingleEvents(true)
             .execute())
         .subscribeOn(Schedulers.boundedElastic())
-        .publishOn(Schedulers.parallel())
         .flatMapMany(events -> buildCalendarEvents(events, userId));
   }
 
@@ -141,7 +140,6 @@ public class GoogleApiServiceImpl implements GoogleApiService {
             .setSingleEvents(true)
             .execute())
         .subscribeOn(Schedulers.boundedElastic())
-        .publishOn(Schedulers.parallel())
         .flatMapMany(events -> buildCalendarEvents(events, userId));
   }
 

@@ -2,6 +2,7 @@ package com.github.twomenteam.disastertracker.controller;
 
 import com.github.twomenteam.disastertracker.model.db.User;
 import com.github.twomenteam.disastertracker.model.db.Warning;
+import com.github.twomenteam.disastertracker.model.dto.WarningMessage;
 import com.github.twomenteam.disastertracker.service.AuthService;
 import com.github.twomenteam.disastertracker.service.WarningService;
 
@@ -136,11 +137,11 @@ public class WarningControllerTest {
 
   @Test
   void success() {
-    var warnings = new Warning[]{
-        Warning.builder().build(),
-        Warning.builder().build(),
-        Warning.builder().build(),
-        Warning.builder().build()
+    var warnings = new WarningMessage[]{
+        WarningMessage.builder().build(),
+        WarningMessage.builder().build(),
+        WarningMessage.builder().build(),
+        WarningMessage.builder().build()
     };
     var apiKey = "some api key";
     var user = User.builder().apiKey(apiKey).build();
@@ -162,7 +163,7 @@ public class WarningControllerTest {
         .accept(MediaType.APPLICATION_JSON)
         .exchange()
         .expectStatus().isOk()
-        .expectBodyList(Warning.class).contains(warnings).hasSize(warnings.length);
+        .expectBodyList(WarningMessage.class).contains(warnings).hasSize(warnings.length);
 
     verify(authService).findUserByApiKey(apiKey);
     verify(warningService).retrieve(user, fromDateTime, toDateTime);

@@ -44,20 +44,20 @@ public class WarningManagerJob {
               .switchIfEmpty(calendarEventRepository
                   .findById(calendarEventId)
                   .map(calendarEvent -> Warning.builder()
-                        .uuid(UUID.randomUUID().toString())
-                        .calendarEventId(calendarEventId)
-                        .createdAt(LocalDateTime.now(ZoneOffset.UTC))
-                        .disasterEventId(disasterEventId)
-                        .userId(calendarEvent.getUserId())
-                        .build())
+                      .uuid(UUID.randomUUID().toString())
+                      .calendarEventId(calendarEventId)
+                      .createdAt(LocalDateTime.now(ZoneOffset.UTC))
+                      .disasterEventId(disasterEventId)
+                      .userId(calendarEvent.getUserId())
+                      .build())
                   .flatMap(warning -> warningRepository
                       .save(warning)
-                      .and(userRepository
+                      .then(userRepository
                           .findById(warning.getUserId())
                           .map(User::getNotificationWebhookUrl)
                           .filter(Objects::nonNull)
                           .flatMap(webhook -> WebClient.create(webhook)
-                              .get()
+                              .post()
                               .uri(builder -> builder
                                   .queryParam("id", warning.getUuid())
                                   .build())

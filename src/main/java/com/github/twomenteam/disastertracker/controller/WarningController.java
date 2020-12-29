@@ -1,7 +1,7 @@
 package com.github.twomenteam.disastertracker.controller;
 
 import com.github.twomenteam.disastertracker.Utils;
-import com.github.twomenteam.disastertracker.model.db.Warning;
+import com.github.twomenteam.disastertracker.model.dto.WarningMessage;
 import com.github.twomenteam.disastertracker.service.AuthService;
 import com.github.twomenteam.disastertracker.service.WarningService;
 
@@ -30,7 +30,8 @@ public class WarningController {
   private final AuthService authService;
 
   @GetMapping("/get")
-  public Flux<Warning> getWarnings(@RequestParam String apiKey, @RequestParam String from, @RequestParam String to) {
+  public Flux<WarningMessage> getWarnings(
+      @RequestParam String apiKey, @RequestParam String from, @RequestParam String to) {
     return authService
         .findUserByApiKey(apiKey)
         .switchIfEmpty(Mono.error(new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Api key is invalid")))
@@ -48,12 +49,11 @@ public class WarningController {
               return warningService.retrieve(user, fromDateTime, toDateTime);
             })
             .onErrorMap(DateTimeParseException.class,
-                e -> new ResponseStatusException(
-                    HttpStatus.BAD_REQUEST, "Date parameters have invalid format")));
+                e -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Date parameters have invalid format")));
   }
 
   @GetMapping("/{uuid}")
-  public Mono<Warning> getByUuid(@PathVariable String uuid) {
+  public Mono<WarningMessage> getByUuid(@PathVariable String uuid) {
     return warningService.getByUuid(uuid);
   }
 }

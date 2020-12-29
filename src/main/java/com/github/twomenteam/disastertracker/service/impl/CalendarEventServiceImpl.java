@@ -32,7 +32,7 @@ public class CalendarEventServiceImpl implements CalendarEventService {
         .findByGoogleIdAndUserId(newCalendarEvent.getGoogleId(), newCalendarEvent.getUserId())
         .flatMap(oldEvent -> warningRepository
             .deleteAllByCalendarEventId(oldEvent.getId())
-            .then(Mono.just(oldEvent)))
+            .thenReturn(oldEvent))
         .map(oldEvent -> oldEvent.toBuilder()
             .start(newCalendarEvent.getStart())
             .end(newCalendarEvent.getEnd())
