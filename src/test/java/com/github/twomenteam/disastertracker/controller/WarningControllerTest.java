@@ -136,6 +136,28 @@ public class WarningControllerTest {
   }
 
   @Test
+  void invalidApiKey() {
+    var apiKey = "some api key";
+
+    when(authService.findUserByApiKey(apiKey))
+        .thenReturn(Mono.empty());
+
+    webTestClient.get()
+        .uri(builder -> builder
+            .path("/warning/get/")
+            .queryParam("apiKey", apiKey)
+            .queryParam("from", "2020-01-01 00:00:00")
+            .queryParam("to", "2021-01-01 00:00:00")
+            .build())
+        .accept(MediaType.APPLICATION_JSON)
+        .exchange()
+        .expectStatus().isBadRequest();
+
+    verify(authService).findUserByApiKey(apiKey);
+    verifyNoMoreInteractions(authService, warningService);
+  }
+
+  @Test
   void success() {
     var warnings = new WarningMessage[]{
         WarningMessage.builder().build(),

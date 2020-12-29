@@ -5,9 +5,12 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
 import reactor.core.publisher.Mono;
+import reactor.util.retry.Retry;
+import reactor.util.retry.RetryBackoffSpec;
 
 public final class Utils {
-  public static final Duration TIMEOUT_DURATION = Duration.ofSeconds(2);
+  public static final Duration TIMEOUT_DURATION = Duration.ofSeconds(5);
+  public static final RetryBackoffSpec DEFAULT_RETRY = Retry.backoff(3, Duration.ofMillis(100));
 
   private Utils() {
   }

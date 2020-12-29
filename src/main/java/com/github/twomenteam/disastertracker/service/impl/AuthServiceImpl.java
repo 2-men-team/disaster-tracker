@@ -18,6 +18,7 @@ import java.util.UUID;
 
 import lombok.RequiredArgsConstructor;
 import reactor.core.publisher.Mono;
+import reactor.util.retry.Retry;
 
 @Service
 @RequiredArgsConstructor
@@ -28,7 +29,8 @@ public class AuthServiceImpl implements AuthService {
   public Mono<User> findUserByApiKey(String apiKey) {
     return userRepository
         .findUserByApiKey(apiKey)
-        .timeout(Utils.TIMEOUT_DURATION);
+        .timeout(Utils.TIMEOUT_DURATION)
+        .retryWhen(Utils.DEFAULT_RETRY);
   }
 
   @Override

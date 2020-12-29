@@ -185,7 +185,6 @@ public class GoogleApiServiceImpl implements GoogleApiService {
     var flow = getAuthFlow(scopes);
     return Mono.fromCallable(() -> flow.newTokenRequest(authCode).setRedirectUri(REDIRECT_URI).execute())
         .subscribeOn(Schedulers.boundedElastic())
-        .doOnNext(response -> System.out.println("Refresh token: " + response.getRefreshToken()))
         .map(googleTokenResponse -> newCredential(flow)
             .setFromTokenResponse(googleTokenResponse))
         .map(credential -> AuthToken.builder()

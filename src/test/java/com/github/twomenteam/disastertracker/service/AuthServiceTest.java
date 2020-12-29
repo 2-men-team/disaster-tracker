@@ -11,6 +11,7 @@ import org.mockito.Mock;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import java.time.Duration;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
@@ -19,7 +20,7 @@ import static org.mockito.Mockito.only;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-@SpringBootTest
+@SpringBootTest(classes = AuthService.class)
 public class AuthServiceTest {
   @InjectMocks
   private AuthServiceImpl authService;
@@ -33,18 +34,18 @@ public class AuthServiceTest {
 
   @Test
   void findUserByApiKeySimple() {
-    var mono = Mono.delay(Duration.ofSeconds(1))
-        .thenReturn(USER);
+    var duration = Duration.ofSeconds(2);
+    var mono = Mono.delay(duration).thenReturn(USER);
 
     when(userRepository.findUserByApiKey(USER.getApiKey()))
         .thenReturn(mono);
 
     StepVerifier.create(authService.findUserByApiKey(USER.getApiKey()))
         .expectSubscription()
-        .expectNoEvent(Duration.ofSeconds(1))
+        .expectNoEvent(duration)
+        .thenAwait(duration)
         .expectNext(USER)
-        .expectComplete()
-        .verify();
+        .verifyComplete();
 
     verify(userRepository, only()).findUserByApiKey(USER.getApiKey());
   }
@@ -54,13 +55,42 @@ public class AuthServiceTest {
     when(userRepository.findUserByApiKey(USER.getApiKey()))
         .thenReturn(Mono.never());
 
-    StepVerifier.create(authService.findUserByApiKey(USER.getApiKey()))
+    StepVerifier.withVirtualTime(() ->
+        authService
+            .findUserByApiKey(USER.getApiKey()))
         .expectSubscription()
+        .expectNoEvent(Utils.TIMEOUT_DURATION)
+        .thenAwait(Utils.TIMEOUT_DURATION)
         .expectTimeout(Utils.TIMEOUT_DURATION)
         .verify();
 
     verify(userRepository, only()).findUserByApiKey(USER.getApiKey());
   }
 
+  @Test
+  void findUserByApiKeyRetry() {
+    var attempt = new AtomicInteger(0);
 
+    var mono = Mono.<User>create(sink -> {
+      if (attempt.getAndIncrement() <= 0) {
+        sink.error(new RuntimeException("Some error"));
+      } else {
+        sink.success(USER);
+      }
+    });
+
+    when(userRepository.findUserByApiKey(USER.getApiKey()))
+        .thenReturn(mono);
+
+    StepVerifier.withVirtualTime(() ->
+        authService
+            .findUserByApiKey(USER.getApiKey()))
+        .expectSubscription()
+        .expectNoEvent(Utils.DEFAULT_RETRY.minBackoff)
+        .thenAwait(Utils.DEFAULT_RETRY.minBackoff)
+        .expectNext(USER)
+        .verifyComplete();
+
+    verify(userRepository, only()).findUserByApiKey(USER.getApiKey());
+  }
 }

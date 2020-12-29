@@ -81,7 +81,6 @@ public class CalendarEventControllerTest {
     when(calendarEventService.updateCalendarEvents(event))
         .thenReturn(Mono.empty());
 
-    // Test |exists| state.
     webTestClient.post()
         .uri("/event/receive")
         .header(CalendarEventController.TOKEN_HEADER_NAME, user.getApiKey())
@@ -151,5 +150,24 @@ public class CalendarEventControllerTest {
     verify(calendarEventService).updateCalendarEvents(event);
 
     verifyNoMoreInteractions(authService, googleApiService, calendarEventService);
+  }
+
+  @Test
+  void ignoreInvalidApiKey() {
+    var apiKey = "some api key";
+
+    when(authService.findUserByApiKey(apiKey))
+        .thenReturn(Mono.empty());
+
+    webTestClient.post()
+        .uri("/event/receive")
+        .header(CalendarEventController.TOKEN_HEADER_NAME, apiKey)
+        .header(CalendarEventController.STATE_HEADER_NAME, CalendarEventController.EXISTS_STATE)
+        .exchange()
+        .expectStatus().isOk()
+        .expectBody().isEmpty();
+
+    verify(authService).findUserByApiKey(apiKey);
+    verifyNoMoreInteractions(authService, calendarEventService, googleApiService);
   }
 }

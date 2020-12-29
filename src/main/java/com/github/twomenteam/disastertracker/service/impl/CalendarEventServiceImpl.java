@@ -1,16 +1,13 @@
 package com.github.twomenteam.disastertracker.service.impl;
 
-import com.github.twomenteam.disastertracker.model.db.CalendarEvent;
 import com.github.twomenteam.disastertracker.model.dto.FetchedCalendarEvent;
 import com.github.twomenteam.disastertracker.repository.CalendarEventRepository;
 import com.github.twomenteam.disastertracker.repository.WarningRepository;
 import com.github.twomenteam.disastertracker.service.CalendarEventService;
 
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
 import lombok.RequiredArgsConstructor;
-import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 @Service
