@@ -40,7 +40,7 @@ public class QueryDisasterApiJob {
               .description(event.getTitle())
               .externalId(event.getId())
               .isActive(isActive)
-              .start(LocalDateTime.parse(geometry.getDate()))
+              .start(LocalDateTime.parse(geometry.getDate(), FORMATTER))
               .end(isActive ? null : LocalDateTime.parse(event.getClosed()))
               .latitude((Double) geometry.getCoordinates().get(1))
               .longitude((Double) geometry.getCoordinates().get(0))
