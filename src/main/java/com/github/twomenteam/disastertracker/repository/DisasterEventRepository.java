@@ -10,6 +10,6 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 public interface DisasterEventRepository extends ReactiveCrudRepository<DisasterEvent, Integer> {
-  Flux<DisasterEvent> findAllByStartBetween(LocalDateTime from, LocalDateTime to);
   Mono<DisasterEvent> findByExternalId(String externalId);
+  Flux<DisasterEvent> findAllByActive(boolean isActive);
 }

@@ -43,7 +43,7 @@ public class MatchDisasterEventJob {
     var from = LocalDateTime.now(ZoneOffset.UTC);
     var to   = from.plusDays(LOOKAHEAD_DAYS);
     var calendarEvents = calendarEventRepository.findAllByStartBetween(from, to).collectList().block();
-    var disasterEvents = disasterEventRepository.findAllByStartBetween(from, to).collectList().block();
+    var disasterEvents = disasterEventRepository.findAllByActive(true).collectList().block();
     var matchedEvents = new ArrayList<Tuple2<Integer, Integer>>();
     for (var calendarEvent : calendarEvents) {
       for (var disasterEvent : disasterEvents) {
@@ -59,7 +59,8 @@ public class MatchDisasterEventJob {
 
   private static double distance(double lat1, double lon1, double lat2, double lon2) {
     double theta = lon1 - lon2;
-    double dist = Math.sin(Math.toRadians(lat1)) * Math.sin(Math.toRadians(lat2)) + Math.cos(Math.toRadians(lat1)) * Math.cos(Math.toRadians(lat2)) * Math.cos(Math.toRadians(theta));
+    double dist = Math.sin(Math.toRadians(lat1)) * Math.sin(Math.toRadians(lat2)) +
+        Math.cos(Math.toRadians(lat1)) * Math.cos(Math.toRadians(lat2)) * Math.cos(Math.toRadians(theta));
     dist = Math.acos(dist);
     dist = Math.toDegrees(dist);
     dist = dist * 60 * 1.1515;
