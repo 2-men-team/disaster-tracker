@@ -21,6 +21,10 @@ public class User {
   String notificationWebhookUrl;
 
   public AuthToken getAuthToken() {
+    if (accessToken == null) {
+      return null;
+    }
+
     return AuthToken.builder()
         .accessToken(accessToken)
         .refreshToken(refreshToken)

@@ -12,6 +12,6 @@ import reactor.core.publisher.Mono;
 
 public interface CalendarEventRepository extends ReactiveCrudRepository<CalendarEvent, Integer> {
   Flux<CalendarEvent> findAllByStartBetween(LocalDateTime from, LocalDateTime to);
-  Mono<CalendarEvent> findByGoogleId(String googleId);
-  Mono<Void> deleteAllByGoogleId(Flux<String> googleIds);
+  Mono<CalendarEvent> findByGoogleIdAndUserId(String googleId, int userId);
+  Mono<Void> deleteAllByGoogleIdAndUserId(String googleId, int userId);
 }

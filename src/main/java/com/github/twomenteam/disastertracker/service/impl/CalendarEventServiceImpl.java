@@ -22,7 +22,7 @@ public class CalendarEventServiceImpl implements CalendarEventService {
   public Mono<Void> upsertCalendarEvents(Flux<CalendarEvent> events) {
     return events
         .flatMap(newEvent -> calendarEventRepository
-            .findByGoogleId(newEvent.getGoogleId())
+            .findByGoogleIdAndUserId(newEvent.getGoogleId(), newEvent.getUserId())
             .flatMap(oldEvent -> warningRepository
                 .deleteAllByCalendarEventId(oldEvent.getId())
                 .then(Mono.just(oldEvent)))
@@ -40,7 +40,9 @@ public class CalendarEventServiceImpl implements CalendarEventService {
 
   @Override
   public Mono<Void> removeCalendarEvents(Flux<CalendarEvent> events) {
-    return calendarEventRepository
-        .deleteAllByGoogleId(events.map(CalendarEvent::getGoogleId));
+    return events
+        .flatMap(event -> calendarEventRepository
+            .deleteAllByGoogleIdAndUserId(event.getGoogleId(), event.getUserId()))
+        .then();
   }
 }
