@@ -2,6 +2,7 @@ package com.github.twomenteam.disastertracker.service;
 
 import com.github.twomenteam.disastertracker.model.db.AuthToken;
 import com.github.twomenteam.disastertracker.model.db.CalendarEvent;
+import com.github.twomenteam.disastertracker.model.dto.FetchedCalendarEvent;
 import com.google.api.services.calendar.CalendarScopes;
 
 import java.time.Instant;
@@ -18,6 +19,6 @@ public interface GoogleApiService {
   String getAuthUrl(String apiKey, List<String> scopes);
   Mono<AuthToken> getTokenFromCode(String authCode, List<String> scopes);
   Mono<AuthToken> refreshToken(AuthToken token, List<String> scopes);
-  Flux<CalendarEvent> fetchAllEvents(AuthToken token, List<String> scopes, int userId);
-  Flux<CalendarEvent> fetchLatestEvents(AuthToken token, Instant updateMin, List<String> scopes, int userId);
+  Flux<FetchedCalendarEvent> fetchAllEvents(AuthToken token, List<String> scopes, int userId);
+  Flux<FetchedCalendarEvent> fetchLatestEvents(AuthToken token, Instant updateMin, List<String> scopes, int userId);
 }

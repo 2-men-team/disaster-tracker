@@ -22,7 +22,6 @@ public class CalendarEventController {
   public static final String STATE_HEADER_NAME = "X-Goog-Resource-State";
   public static final String SYNC_STATE = "sync";
   public static final String EXISTS_STATE = "exists";
-  public static final String NOT_EXISTS_STATE = "not_exists";
 
   private final CalendarEventService calendarEventService;
   private final AuthService authService;
@@ -37,7 +36,7 @@ public class CalendarEventController {
       return Mono.empty();
     }
 
-    var updateMin = Instant.now().minusSeconds(10);
+    var updateMin = Instant.now().minusSeconds(120);
     return authService
         .findUserByApiKey(apiKey)
         .flatMap(user -> googleApiService
@@ -47,12 +46,7 @@ public class CalendarEventController {
         .flatMap(user -> googleApiService
             .fetchLatestEvents(user.getAuthToken(), updateMin, GoogleApiService.DEFAULT_SCOPES, user.getId())
             .doOnNext(event -> System.out.println("Got event: " + event))
-            .as(events -> {
-              if (EXISTS_STATE.equals(state)) {
-                return calendarEventService.upsertCalendarEvents(events);
-              } else {
-                return calendarEventService.removeCalendarEvents(events);
-              }
-            }));
+            .flatMap(calendarEventService::updateCalendarEvents)
+            .then());
   }
 }

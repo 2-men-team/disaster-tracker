@@ -3,6 +3,7 @@ package com.github.twomenteam.disastertracker.controller;
 import com.github.twomenteam.disastertracker.model.db.AuthToken;
 import com.github.twomenteam.disastertracker.model.db.CalendarEvent;
 import com.github.twomenteam.disastertracker.model.db.User;
+import com.github.twomenteam.disastertracker.model.dto.FetchedCalendarEvent;
 import com.github.twomenteam.disastertracker.model.dto.RegisterResponseBody;
 import com.github.twomenteam.disastertracker.service.AuthService;
 import com.github.twomenteam.disastertracker.service.CalendarEventService;
@@ -121,7 +122,7 @@ public class AuthControllerTest {
         .id(45)
         .build()
         .withAuthToken(authToken);
-    var calendarEvents = Flux.<CalendarEvent>empty();
+    var calendarEvents = Flux.<FetchedCalendarEvent>empty();
 
     when(googleApiService.getTokenFromCode(code, scopes))
         .thenReturn(Mono.just(authToken));
@@ -132,9 +133,6 @@ public class AuthControllerTest {
 
     when(authService.saveAuthToken(apiKey, authToken))
         .thenReturn(Mono.just(user));
-
-    when(calendarEventService.upsertCalendarEvents(calendarEvents))
-        .thenReturn(Mono.empty());
 
     webTestClient.get()
         .uri(uriBuilder -> uriBuilder
@@ -152,8 +150,6 @@ public class AuthControllerTest {
     verify(googleApiService).watchCalendarEvents(authToken, apiKey, scopes);
 
     verify(authService).saveAuthToken(apiKey, authToken);
-
-    verify(calendarEventService).upsertCalendarEvents(calendarEvents);
 
     verifyNoMoreInteractions(authService, calendarEventService, googleApiService);
   }

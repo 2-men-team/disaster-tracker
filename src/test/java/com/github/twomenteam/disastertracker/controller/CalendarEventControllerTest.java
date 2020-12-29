@@ -3,6 +3,7 @@ package com.github.twomenteam.disastertracker.controller;
 import com.github.twomenteam.disastertracker.model.db.AuthToken;
 import com.github.twomenteam.disastertracker.model.db.CalendarEvent;
 import com.github.twomenteam.disastertracker.model.db.User;
+import com.github.twomenteam.disastertracker.model.dto.FetchedCalendarEvent;
 import com.github.twomenteam.disastertracker.service.AuthService;
 import com.github.twomenteam.disastertracker.service.CalendarEventService;
 import com.github.twomenteam.disastertracker.service.GoogleApiService;
@@ -55,16 +56,13 @@ public class CalendarEventControllerTest {
 
   @Test
   void receiveCalendarEventNoTokenRefresh() {
-    var events = Flux.just(
-        CalendarEvent.builder()
+    var event = FetchedCalendarEvent.builder()
+        .status(FetchedCalendarEvent.Status.UPDATE)
+        .calendarEvent(CalendarEvent.builder()
             .googleId("a")
-            .build(),
-        CalendarEvent.builder()
-            .googleId("b")
-            .build(),
-        CalendarEvent.builder()
-            .googleId("c")
-            .build());
+            .build())
+        .build();
+    var events = Flux.just(event);
     var user = User.builder()
         .apiKey("some api key")
         .id(34)
@@ -80,9 +78,7 @@ public class CalendarEventControllerTest {
         eq(user.getAuthToken()), notNull(), anyList(), eq(user.getId())))
         .thenReturn(events);
 
-    when(calendarEventService.upsertCalendarEvents(events))
-        .thenReturn(Mono.empty());
-    when(calendarEventService.removeCalendarEvents(events))
+    when(calendarEventService.updateCalendarEvents(event))
         .thenReturn(Mono.empty());
 
     // Test |exists| state.
@@ -99,42 +95,20 @@ public class CalendarEventControllerTest {
     verify(googleApiService).refreshToken(eq(user.getAuthToken()), anyList());
     verify(googleApiService).fetchLatestEvents(eq(user.getAuthToken()), notNull(), anyList(), eq(user.getId()));
 
-    verify(calendarEventService).upsertCalendarEvents(events);
-
-    verifyNoMoreInteractions(authService, googleApiService, calendarEventService);
-    clearInvocations(authService, googleApiService, calendarEventService);
-
-    // Test |not_exists| state.
-    webTestClient.post()
-        .uri("/event/receive")
-        .header(CalendarEventController.TOKEN_HEADER_NAME, user.getApiKey())
-        .header(CalendarEventController.STATE_HEADER_NAME, CalendarEventController.NOT_EXISTS_STATE)
-        .exchange()
-        .expectStatus().isOk()
-        .expectBody().isEmpty();
-
-    verify(authService).findUserByApiKey(user.getApiKey());
-
-    verify(googleApiService).refreshToken(eq(user.getAuthToken()), anyList());
-    verify(googleApiService).fetchLatestEvents(eq(user.getAuthToken()), notNull(), anyList(), eq(user.getId()));
-
-    verify(calendarEventService).removeCalendarEvents(events);
+    verify(calendarEventService).updateCalendarEvents(event);
 
     verifyNoMoreInteractions(authService, googleApiService, calendarEventService);
   }
 
   @Test
   void receiveCalendarEventWithTokenRefresh() {
-    var events = Flux.just(
-        CalendarEvent.builder()
+    var event = FetchedCalendarEvent.builder()
+        .status(FetchedCalendarEvent.Status.UPDATE)
+        .calendarEvent(CalendarEvent.builder()
             .googleId("a")
-            .build(),
-        CalendarEvent.builder()
-            .googleId("b")
-            .build(),
-        CalendarEvent.builder()
-            .googleId("c")
-            .build());
+            .build())
+        .build();
+    var events = Flux.just(event);
     var user = User.builder()
         .apiKey("some api key")
         .id(34)
@@ -156,9 +130,7 @@ public class CalendarEventControllerTest {
     when(googleApiService.fetchLatestEvents(eq(newAuthToken), notNull(), anyList(), eq(user.getId())))
         .thenReturn(events);
 
-    when(calendarEventService.upsertCalendarEvents(events))
-        .thenReturn(Mono.empty());
-    when(calendarEventService.removeCalendarEvents(events))
+    when(calendarEventService.updateCalendarEvents(event))
         .thenReturn(Mono.empty());
 
     // Test |exists| state.
@@ -176,27 +148,7 @@ public class CalendarEventControllerTest {
     verify(googleApiService).refreshToken(eq(user.getAuthToken()), anyList());
     verify(googleApiService).fetchLatestEvents(eq(newAuthToken), notNull(), anyList(), eq(user.getId()));
 
-    verify(calendarEventService).upsertCalendarEvents(events);
-
-    verifyNoMoreInteractions(authService, googleApiService, calendarEventService);
-    clearInvocations(authService, googleApiService, calendarEventService);
-
-    // Test |not_exists| state.
-    webTestClient.post()
-        .uri("/event/receive")
-        .header(CalendarEventController.TOKEN_HEADER_NAME, user.getApiKey())
-        .header(CalendarEventController.STATE_HEADER_NAME, CalendarEventController.NOT_EXISTS_STATE)
-        .exchange()
-        .expectStatus().isOk()
-        .expectBody().isEmpty();
-
-    verify(authService).findUserByApiKey(user.getApiKey());
-    verify(authService).saveAuthToken(newUser.getApiKey(), newAuthToken);
-
-    verify(googleApiService).refreshToken(eq(user.getAuthToken()), anyList());
-    verify(googleApiService).fetchLatestEvents(eq(newAuthToken), notNull(), anyList(), eq(user.getId()));
-
-    verify(calendarEventService).removeCalendarEvents(events);
+    verify(calendarEventService).updateCalendarEvents(event);
 
     verifyNoMoreInteractions(authService, googleApiService, calendarEventService);
   }

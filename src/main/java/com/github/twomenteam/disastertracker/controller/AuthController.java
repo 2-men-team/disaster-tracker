@@ -49,7 +49,8 @@ public class AuthController {
             .saveAuthToken(apiKey, token)
             .flatMap(user -> googleApiService
                 .fetchAllEvents(token, scopes, user.getId())
-                .as(calendarEventService::upsertCalendarEvents))
+                .flatMap(calendarEventService::updateCalendarEvents)
+                .then())
             .and(googleApiService.watchCalendarEvents(token, apiKey, scopes)));
   }
 }

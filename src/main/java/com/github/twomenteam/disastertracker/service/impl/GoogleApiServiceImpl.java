@@ -3,6 +3,7 @@ package com.github.twomenteam.disastertracker.service.impl;
 import com.github.twomenteam.disastertracker.model.db.AuthToken;
 import com.github.twomenteam.disastertracker.model.db.CalendarEvent;
 import com.github.twomenteam.disastertracker.model.db.Coordinates;
+import com.github.twomenteam.disastertracker.model.dto.FetchedCalendarEvent;
 import com.github.twomenteam.disastertracker.service.GoogleApiService;
 import com.google.api.client.auth.oauth2.Credential;
 import com.google.api.client.googleapis.auth.oauth2.GoogleAuthorizationCodeFlow;
@@ -82,24 +83,38 @@ public class GoogleApiServiceImpl implements GoogleApiService {
     return Instant.ofEpochMilli(value).atZone(ZoneId.of(DEFAULT_TIME_ZONE)).toLocalDateTime();
   }
 
-  private Flux<CalendarEvent> buildCalendarEvents(Events events, int userId) {
+  private Flux<FetchedCalendarEvent> buildCalendarEvents(Events events, int userId) {
     return Flux.fromIterable(events.getItems())
-        .filter(event -> event.getLocation() != null)
-        .flatMap(event ->
-            getCoordinateFromAddress(event.getLocation())
-                .map(coordinates -> CalendarEvent.builder()
-                    .userId(userId)
+        .flatMap(event -> {
+          if ("cancelled".equals(event.getStatus()) || event.getLocation() == null) {
+            return Mono.just(FetchedCalendarEvent.builder()
+                .status(FetchedCalendarEvent.Status.DELETE)
+                .calendarEvent(CalendarEvent.builder()
                     .googleId(event.getId())
-                    .summary(event.getSummary())
-                    .start(eventDateTimeToLocalDateTime(event.getStart()))
-                    .end(eventDateTimeToLocalDateTime(event.getEnd()))
-                    .location(event.getLocation())
-                    .build()
-                    .withCoordinates(coordinates)));
+                    .userId(userId)
+                    .build())
+                .build());
+          }
+
+          return getCoordinateFromAddress(event.getLocation())
+              .map(coordinates -> CalendarEvent.builder()
+                  .userId(userId)
+                  .googleId(event.getId())
+                  .summary(event.getSummary())
+                  .start(eventDateTimeToLocalDateTime(event.getStart()))
+                  .end(eventDateTimeToLocalDateTime(event.getEnd()))
+                  .location(event.getLocation())
+                  .build()
+                  .withCoordinates(coordinates))
+              .map(calendarEvent -> FetchedCalendarEvent.builder()
+                  .status(FetchedCalendarEvent.Status.UPDATE)
+                  .calendarEvent(calendarEvent)
+                  .build());
+        });
   }
 
   @Override
-  public Flux<CalendarEvent> fetchAllEvents(AuthToken authToken, List<String> scopes, int userId) {
+  public Flux<FetchedCalendarEvent> fetchAllEvents(AuthToken authToken, List<String> scopes, int userId) {
     return Mono.fromCallable(() ->
         getCalendarApi(credentialFromToken(authToken, scopes))
             .events()
@@ -114,7 +129,8 @@ public class GoogleApiServiceImpl implements GoogleApiService {
   }
 
   @Override
-  public Flux<CalendarEvent> fetchLatestEvents(AuthToken token, Instant updateMin, List<String> scopes, int userId) {
+  public Flux<FetchedCalendarEvent> fetchLatestEvents(AuthToken token, Instant updateMin, List<String> scopes,
+                                                      int userId) {
     return Mono.fromCallable(() ->
         getCalendarApi(credentialFromToken(token, scopes))
             .events()
