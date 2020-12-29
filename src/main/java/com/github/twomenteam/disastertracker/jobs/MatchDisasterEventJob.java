@@ -54,6 +54,7 @@ public class MatchDisasterEventJob {
     }
 
     warningsKafkaProducer.sendMessages(WarningsKafkaProducer.TOPIC, Flux.fromIterable(matchedEvents)).blockLast();
+    System.out.println("Exiting event matcher");
   }
 
   private static double distance(double lat1, double lon1, double lat2, double lon2) {

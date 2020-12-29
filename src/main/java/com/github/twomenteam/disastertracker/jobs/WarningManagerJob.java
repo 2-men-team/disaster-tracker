@@ -25,7 +25,7 @@ public class WarningManagerJob {
 
   @Scheduled(initialDelay = 0, fixedDelay = Long.MAX_VALUE)
   public void listenToNewWarnings() {
-    System.out.println("Executing warning manager");
+    System.out.println("Entering warning manager");
     warningsKafkaConsumer
         .consumeMessages(TOPIC)
         .doOnNext(message -> System.out.println("Got new warning " + message))
@@ -45,5 +45,6 @@ public class WarningManagerJob {
                   .flatMap(warningRepository::save));
         })
         .blockLast();
+    System.out.println("Exiting warning manager");
   }
 }

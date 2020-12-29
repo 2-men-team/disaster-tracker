@@ -56,5 +56,6 @@ public class QueryDisasterApiJob {
             disasterEventRepository.save(disasterEvent).block();
           }
         });
+    System.out.println("Exiting disaster API");
   }
 }
