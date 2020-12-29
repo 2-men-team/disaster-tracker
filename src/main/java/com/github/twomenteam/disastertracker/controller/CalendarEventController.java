@@ -46,6 +46,7 @@ public class CalendarEventController {
             .switchIfEmpty(Mono.just(user)))
         .flatMap(user -> googleApiService
             .fetchLatestEvents(user.getAuthToken(), updateMin, GoogleApiService.DEFAULT_SCOPES, user.getId())
+            .doOnNext(event -> System.out.println("Got event: " + event))
             .as(events -> {
               if (EXISTS_STATE.equals(state)) {
                 return calendarEventService.upsertCalendarEvents(events);
