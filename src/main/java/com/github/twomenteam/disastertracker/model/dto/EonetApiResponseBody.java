@@ -2,16 +2,21 @@ package com.github.twomenteam.disastertracker.model.dto;
 
 import java.util.List;
 
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import lombok.Value;
 
-@Value
+@Data
+@NoArgsConstructor
 public class EonetApiResponseBody {
   String title;
   String description;
   String link;
   List<Event> events;
   
-  @Value
+  @Data
+  @NoArgsConstructor
   public static class Event {
     String id;
     String title;
@@ -22,24 +27,27 @@ public class EonetApiResponseBody {
     List<Geometry> geometry;
   }
 
-  @Value
+  @Data
+  @NoArgsConstructor
   public static class Category {
     String id;
     String title;
   }
 
-  @Value
+  @Data
+  @NoArgsConstructor
   public static class Source {
     String id;
     String url;
   }
 
-  @Value
+  @Data
+  @NoArgsConstructor
   public static class Geometry {
     String magnitudeValue;
     String magnitudeUnit;
     String date;
     String type;
-    List<Double> coordinates;
+    List<Object> coordinates;
   }
 }

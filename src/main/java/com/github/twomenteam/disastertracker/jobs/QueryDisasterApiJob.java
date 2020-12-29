@@ -10,6 +10,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -19,6 +20,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class QueryDisasterApiJob {
   private static final String EONET_REQUEST_URL = "https://eonet.sci.gsfc.nasa.gov/api/v3/events";
+  private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ISO_INSTANT;
 
   private final DisasterEventRepository disasterEventRepository;
 
@@ -27,23 +29,28 @@ public class QueryDisasterApiJob {
     System.out.println("Querying disaster API");
     EonetApiResponseBody responseBody = new RestTemplate().getForObject(EONET_REQUEST_URL, EonetApiResponseBody.class);
 
-    responseBody.getEvents().stream().map(event -> {
-      boolean isActive = event.getClosed() == null;
-      EonetApiResponseBody.Geometry geometry = event.getGeometry().get(event.getGeometry().size() - 1); // get the most latest
-      return DisasterEvent.builder()
-          .description(event.getTitle())
-          .externalId(event.getId())
-          .isActive(isActive)
-          .start(LocalDateTime.parse(geometry.getDate()))
-          .end(isActive ? null : LocalDateTime.parse(event.getClosed()))
-          .latitude(geometry.getCoordinates().get(1))
-          .longitude(geometry.getCoordinates().get(0))
-          .build();
-    }).forEach((disasterEvent) -> {
-      DisasterEvent event = disasterEventRepository.findByExternalId(disasterEvent.getExternalId()).block();
-      if (event == null) {
-        disasterEventRepository.save(disasterEvent).block();
-      }
-    });
+    responseBody
+        .getEvents()
+        .stream()
+        .filter(event -> event.getGeometry().get(0).getCoordinates().get(0) instanceof Double)
+        .map(event -> {
+          boolean isActive = event.getClosed() == null;
+          EonetApiResponseBody.Geometry geometry = event.getGeometry().get(event.getGeometry().size() - 1); // get the most latest
+          return DisasterEvent.builder()
+              .description(event.getTitle())
+              .externalId(event.getId())
+              .isActive(isActive)
+              .start(LocalDateTime.parse(geometry.getDate()))
+              .end(isActive ? null : LocalDateTime.parse(event.getClosed()))
+              .latitude((Double) geometry.getCoordinates().get(1))
+              .longitude((Double) geometry.getCoordinates().get(0))
+              .build();
+        })
+        .forEach((disasterEvent) -> {
+          DisasterEvent event = disasterEventRepository.findByExternalId(disasterEvent.getExternalId()).block();
+          if (event == null) {
+            disasterEventRepository.save(disasterEvent).block();
+          }
+        });
   }
 }
