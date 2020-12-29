@@ -121,6 +121,7 @@ public class GoogleApiServiceImpl implements GoogleApiService {
             .list(CALENDAR_ID)
             .setTimeMin(new DateTime(System.currentTimeMillis()))
             .setTimeZone(DEFAULT_TIME_ZONE)
+            .setOrderBy("startTime")
             .setSingleEvents(true)
             .execute())
         .subscribeOn(Schedulers.boundedElastic())
