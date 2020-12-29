@@ -219,9 +219,8 @@ public class GoogleApiServiceImpl implements GoogleApiService {
       return credential;
     })
         .subscribeOn(Schedulers.boundedElastic())
-        .map(credential -> AuthToken.builder()
+        .map(credential -> authToken.toBuilder()
             .expirationTimeInMillis(credential.getExpirationTimeMilliseconds())
-            .refreshToken(credential.getRefreshToken())
             .accessToken(credential.getAccessToken())
             .build());
   }
