@@ -25,8 +25,10 @@ public class WarningManagerJob {
 
   @Scheduled(initialDelay = 0, fixedDelay = Long.MAX_VALUE)
   public void listenToNewWarnings() {
+    System.out.println("Executing warning manager");
     warningsKafkaConsumer
         .consumeMessages(TOPIC)
+        .doOnNext(message -> System.out.println("Got new warning " + message))
         .flatMap(record -> {
           int calendarEventId = record.key();
           int disasterEventId = record.value();

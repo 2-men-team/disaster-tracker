@@ -22,11 +22,12 @@ public class QueryDisasterApiJob {
 
   private final DisasterEventRepository disasterEventRepository;
 
-  @Scheduled(fixedRate = 1000*60*60*12)
+  @Scheduled(fixedRate = 1000 * 30/*1000*60*60*12*/)
   public void queryDisasterApi() {
+    System.out.println("Querying disaster API");
     EonetApiResponseBody responseBody = new RestTemplate().getForObject(EONET_REQUEST_URL, EonetApiResponseBody.class);
 
-    List<DisasterEvent> disasterEvents = responseBody.getEvents().stream().map(event -> {
+    responseBody.getEvents().stream().map(event -> {
       boolean isActive = event.getClosed() == null;
       EonetApiResponseBody.Geometry geometry = event.getGeometry().get(event.getGeometry().size() - 1); // get the most latest
       return DisasterEvent.builder()
@@ -35,15 +36,13 @@ public class QueryDisasterApiJob {
           .isActive(isActive)
           .start(LocalDateTime.parse(geometry.getDate()))
           .end(isActive ? null : LocalDateTime.parse(event.getClosed()))
-          .latitude(geometry.getCoordinates().get(0))
-          .longitude(geometry.getCoordinates().get(1))
+          .latitude(geometry.getCoordinates().get(1))
+          .longitude(geometry.getCoordinates().get(0))
           .build();
-    }).collect(Collectors.toList());
-
-    disasterEvents.forEach((disasterEvent) -> {
+    }).forEach((disasterEvent) -> {
       DisasterEvent event = disasterEventRepository.findByExternalId(disasterEvent.getExternalId()).block();
       if (event == null) {
-        disasterEventRepository.save(disasterEvent);
+        disasterEventRepository.save(disasterEvent).block();
       }
     });
   }

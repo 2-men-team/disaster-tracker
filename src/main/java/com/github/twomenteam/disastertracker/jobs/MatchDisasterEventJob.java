@@ -37,8 +37,9 @@ public class MatchDisasterEventJob {
     return distance < DISASTER_RADIUS;
   }
   
-  @Scheduled(fixedDelay = 1000*60*60)
+  @Scheduled(fixedDelay = 1000 * 30/*1000*60*60*/)
   public void matchDisasterEvents() {
+    System.out.println("Matching disaster events to calendar events");
     var from = LocalDateTime.now(ZoneOffset.UTC);
     var to   = from.plusDays(LOOKAHEAD_DAYS);
     var calendarEvents = calendarEventRepository.findAllByStartBetween(from, to).collectList().block();
