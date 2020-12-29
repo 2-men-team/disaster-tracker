@@ -17,6 +17,7 @@ import java.time.format.DateTimeParseException;
 
 import lombok.RequiredArgsConstructor;
 import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 @RestController
 @RequestMapping("/warning")
@@ -31,6 +32,7 @@ public class WarningController {
   public Flux<Warning> getWarnings(@RequestParam String apiKey, @RequestParam String from, @RequestParam String to) {
     return authService
         .findUserByApiKey(apiKey)
+        .switchIfEmpty(Mono.error(new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Api key is invalid")))
         .flatMapMany(user -> Flux.zip(
             Utils.parseDateTime(from, FORMATTER),
             Utils.parseDateTime(to, FORMATTER))
