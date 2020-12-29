@@ -33,18 +33,21 @@ public class QueryDisasterApiJob {
     responseBody
         .getEvents()
         .stream()
-        .filter(event -> event.getGeometry().get(0).getCoordinates().get(0) instanceof Double)
+        .filter(event -> event.getGeometry().get(0).getCoordinates().get(0) instanceof Number)
         .map(event -> {
           boolean isActive = event.getClosed() == null;
           EonetApiResponseBody.Geometry geometry = event.getGeometry().get(event.getGeometry().size() - 1); // get the most latest
+
+          var latitude = ((Number) geometry.getCoordinates().get(1)).doubleValue();
+          var longitude = ((Number) geometry.getCoordinates().get(0)).doubleValue();
           return DisasterEvent.builder()
               .description(event.getTitle())
               .externalId(event.getId())
               .isActive(isActive)
               .start(Instant.parse(geometry.getDate()).atZone(ZoneOffset.UTC).toLocalDateTime())
               .end(isActive ? null : LocalDateTime.parse(event.getClosed()))
-              .latitude((Double) geometry.getCoordinates().get(1))
-              .longitude((Double) geometry.getCoordinates().get(0))
+              .latitude(latitude)
+              .longitude(longitude)
               .build();
         })
         .forEach((disasterEvent) -> {
