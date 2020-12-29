@@ -27,7 +27,7 @@ create table disaster_event (
     id int primary key auto_increment,
     description text,
     external_id varchar(25) unique not null ,
-    is_active boolean not null ,
+    active boolean not null ,
     start datetime not null ,
     end datetime,
     latitude double not null ,
