@@ -36,7 +36,7 @@ public class CalendarEventController {
       return Mono.empty();
     }
 
-    var updateMin = Instant.now().minusSeconds(120);
+    var updateMin = Instant.now().minusSeconds(30);
     return authService
         .findUserByApiKey(apiKey)
         .flatMap(user -> googleApiService
