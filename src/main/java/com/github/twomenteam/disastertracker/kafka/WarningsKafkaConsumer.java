@@ -1,13 +1,12 @@
 package com.github.twomenteam.disastertracker.kafka;
 
-import org.apache.kafka.clients.KafkaClient;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.common.serialization.IntegerDeserializer;
 import org.springframework.stereotype.Component;
 
-import java.util.Map;
-import java.util.HashMap;
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 
 import reactor.core.publisher.Flux;
 import reactor.kafka.receiver.KafkaReceiver;
@@ -28,7 +27,7 @@ public class WarningsKafkaConsumer {
     props.put(ConsumerConfig.GROUP_ID_CONFIG, "warning-group");
     props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, IntegerDeserializer.class);
     props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, IntegerDeserializer.class);
-    props.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest");
+    props.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "latest");
     receiverOptions = ReceiverOptions.create(props);
   }
 
